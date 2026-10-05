@@ -1,13 +1,17 @@
 /**
  * playwright-cli run-code script: runs axe-core against the page currently
- * open in the session and returns a compact violation report.
+ * open in the session and returns a compact violation report. Normally run
+ * through axe-scan.sh, which passes the path of a global axe-core install.
  *
- *   playwright-cli --raw run-code --filename=<skill-dir>/scripts/axe.js
+ * axe-core comes from options.axePath when that file loads, otherwise from
+ * jsDelivr at the pinned version. A strict Content-Security-Policy blocks the
+ * file route unless the browser was opened with cli.config.json (bypassCSP);
+ * the CDN route is unaffected.
  *
  * Options are read from window.axeScanOptions, set beforehand with
  *   playwright-cli eval "window.axeScanOptions = { include: 'main', exclude: ['#ads'], bestPractices: true }"
  * Supported keys: tags (string[]), bestPractices (boolean), include (selector),
- * exclude (selector[]), json (boolean, return raw axe results).
+ * exclude (selector[]), json (boolean, return raw axe results), axePath (file).
  * They last until the next navigation.
  *
  * Throws when violations are found, so the command exits non-zero.
@@ -17,14 +21,24 @@ async page => {
   const WCAG_22_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
   const SNIPPET_MAX_LENGTH = 200;
 
-  const alreadyLoaded = await page.evaluate(version => window.axe?.version === version, AXE_VERSION);
-  if (!alreadyLoaded) {
-    const response = await fetch(`https://cdn.jsdelivr.net/npm/axe-core@${AXE_VERSION}/axe.min.js`);
+  const options = (await page.evaluate(() => window.axeScanOptions)) ?? {};
+
+  let axeSource = 'already loaded';
+  const isAxeLoaded = () => page.evaluate(() => typeof window.axe?.run === 'function');
+  if (!(await isAxeLoaded()) && options.axePath) {
+    try {
+      await page.addScriptTag({ path: options.axePath });
+      axeSource = options.axePath;
+    } catch {}
+  }
+  if (!(await isAxeLoaded())) {
+    const cdnUrl = `https://cdn.jsdelivr.net/npm/axe-core@${AXE_VERSION}/axe.min.js`;
+    const response = await fetch(cdnUrl);
     if (!response.ok) throw new Error(`Could not download axe-core ${AXE_VERSION}: HTTP ${response.status}`);
     await page.evaluate(await response.text());
+    axeSource = cdnUrl;
   }
 
-  const options = (await page.evaluate(() => window.axeScanOptions)) ?? {};
   const tags = [...(options.tags ?? WCAG_22_AA_TAGS), ...(options.bestPractices ? ['best-practice'] : [])];
   const context = {
     ...(options.include ? { include: [options.include] } : {}),
@@ -66,7 +80,7 @@ async page => {
       lines.push(`  - ${item.id}: ${item.help} [${targets.slice(0, 5).join(', ')}${targets.length > 5 ? ', …' : ''}]`);
     }
   }
-  lines.push('', `axe-core ${results.testEngine.version} | tags: ${tags.join(',')} | violations: ${results.violations.length}`);
+  lines.push('', `axe-core ${results.testEngine.version} from ${axeSource} | tags: ${tags.join(',')} | violations: ${results.violations.length}`);
 
   const report = lines.join('\n');
   if (results.violations.length > 0) throw new Error(report);

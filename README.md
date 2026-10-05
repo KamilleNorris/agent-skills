@@ -16,15 +16,21 @@ npx skills add KamilleNorris/agent-skills@accessibility -g
 
 Or clone and link `skills/<name>` into your agent's skills directory (e.g. `~/.agents/skills/`).
 
-## accessibility: axe scan setup
+## accessibility: test setup
 
-The scan runs axe-core in a browser driven by [`playwright-cli`](https://github.com/microsoft/playwright-cli):
+**Testing pages requires [`playwright-cli`](https://github.com/microsoft/playwright-cli) installed globally.** The writing rules work without it.
 
 ```bash
-npm install -g @playwright/cli@latest
+npm install -g @playwright/cli@latest   # required
+npm install -g axe-core@4.13.0          # optional: offline scans; otherwise axe-core loads from jsDelivr
+```
+
+Check it works:
+
+```bash
 python3 -m http.server 8000 --directory skills/accessibility/scripts/fixtures &
-playwright-cli open http://localhost:8000/broken.html
-playwright-cli --raw run-code --filename=skills/accessibility/scripts/axe.js   # expect 6 violations
+playwright-cli open http://localhost:8000/broken.html --config=skills/accessibility/scripts/cli.config.json
+skills/accessibility/scripts/axe-scan.sh   # expect 6 violations
 playwright-cli close
 ```
 

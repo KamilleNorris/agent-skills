@@ -16,17 +16,24 @@ If none is configured, recommend the matching plugin to the user instead of addi
 
 ## 2. Rendered scan with axe
 
-Drive the page with [`playwright-cli`](https://github.com/microsoft/playwright-cli), then run `scripts/axe.js` (next to this skill's `SKILL.md`) in the same session. It loads axe-core 4.13 into the open page and runs every WCAG 2.0/2.1/2.2 A and AA rule, including `target-size`, which axe leaves off by default.
+**Requires [`playwright-cli`](https://github.com/microsoft/playwright-cli) installed globally:** `npm install -g @playwright/cli@latest`. It drives the installed Chrome; if it reports a missing browser, run `playwright-cli install-browser`.
+
+Open the page with `playwright-cli`, then run `scripts/axe-scan.sh` (next to this skill's `SKILL.md`). It runs axe-core in the open page against every WCAG 2.0/2.1/2.2 A and AA rule, including `target-size`, which axe leaves off by default.
 
 ```bash
-playwright-cli open http://localhost:3000/settings
-playwright-cli --raw run-code --filename=<skill-dir>/scripts/axe.js
+playwright-cli open http://localhost:3000/settings --config=<skill-dir>/scripts/cli.config.json
+<skill-dir>/scripts/axe-scan.sh
 playwright-cli goto http://localhost:3000/login
-playwright-cli --raw run-code --filename=<skill-dir>/scripts/axe.js
+<skill-dir>/scripts/axe-scan.sh
 playwright-cli close
 ```
 
-The command exits non-zero and prints the report when there are violations; it exits zero with `violations: 0` when clean.
+Exit code `0` is clean, `1` means violations (report printed) or a scan error, `2` means `playwright-cli` is missing. Extra arguments go to `playwright-cli`, e.g. `axe-scan.sh -s=<session>` for a named session.
+
+**Where axe-core comes from.** The last line of the report names the source.
+- A global `axe-core` install (`npm install -g axe-core@4.13.0`) is used first and works offline.
+- Otherwise axe-core 4.13.0 downloads from jsDelivr on each scan.
+- Pages with a strict Content-Security-Policy block the global file unless the browser was opened with `--config=<skill-dir>/scripts/cli.config.json` (it sets `bypassCSP`); without it the scan falls back to jsDelivr.
 
 **Options.** Set `window.axeScanOptions` with `eval` before the scan; it lasts until the next navigation.
 
@@ -48,14 +55,12 @@ playwright-cli eval "window.axeScanOptions = { include: '#settings-form', exclud
 | Mobile layout (run too when the change is responsive) | `playwright-cli open <url> --mobile`, or `playwright-cli resize 375 812` |
 | Local HTML file (`file://` is blocked) | Serve the folder, e.g. `python3 -m http.server 8000`, and open `http://localhost:8000/<file>` |
 
-**Setup.** `npm install -g @playwright/cli@latest`. It uses the installed Chrome by default; if it reports a missing browser, run `playwright-cli install-browser`. Each scan downloads the pinned axe-core from jsDelivr, so it needs network access.
-
 **Reading results.**
 - *Violations*: fix every one. Each entry gives the rule id, its WCAG criteria, the CSS target, the HTML, and axe's fix summary. The `helpUrl` explains the rule.
 - *Needs manual review*: axe could not decide, typically contrast over images or gradients. Inspect each one and report what you concluded.
 - Fix the source, reload, and rerun the scan until it reports zero violations.
 
-**States.** One scan covers one DOM state. Put the page into each state the change touches with `playwright-cli` (`click`, `fill`, `press`), then rerun the scan without navigating. To keep that coverage as a regression test, add `@axe-core/playwright` to the project's own e2e tests:
+**States.** One scan covers one DOM state. Put the page into each state the change touches with `playwright-cli` (`click`, `fill`, `press`), then rerun `axe-scan.sh` without navigating. To keep that coverage as a regression test, add `@axe-core/playwright` to the project's own e2e tests:
 
 ```ts
 import AxeBuilder from "@axe-core/playwright";
