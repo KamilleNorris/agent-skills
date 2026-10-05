@@ -89,3 +89,7 @@ Check every interactive element the change touches, driving it with `playwright-
 - [ ] Animation stops or reduces with `prefers-reduced-motion: reduce` (`playwright-cli set-reduced-motion reduce`).
 
 `playwright-cli snapshot` shows the accessibility tree: the names, roles, and states a screen reader gets. Use it to confirm labels and state changes. It does not replace testing with a real screen reader (VoiceOver, NVDA), which stays with the user.
+
+## Cleanup
+
+`playwright-cli` writes session logs and snapshots to `.playwright-cli/` in the directory you ran it from. Before running the first command, check whether that folder already exists. When testing is done, run `playwright-cli close`, then delete `.playwright-cli/` if you created it, so it never lands in a commit.
