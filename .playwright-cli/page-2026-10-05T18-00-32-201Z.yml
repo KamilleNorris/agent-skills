@@ -1,0 +1,4 @@
+- generic [active] [ref=e1]:
+  - button [ref=e3]
+  - textbox "Email" [ref=e4]
+  - paragraph [ref=e5]: Low contrast text

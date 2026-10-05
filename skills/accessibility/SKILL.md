@@ -18,7 +18,7 @@ Prefer the native element (`<button>`, `<a href>`, `<label>`, `<dialog>`, `<sele
 Read [`references/testing.md`](references/testing.md), then run every layer the project can support:
 
 1. **Static lint**: the project's a11y ESLint plugin, when configured.
-2. **Rendered scan**: `scripts/axe-scan.mjs` against each changed page, in each state the change touches (open menu, error message, empty list, dialog).
+2. **Rendered scan**: `scripts/axe.js` through `playwright-cli` on each changed page, in each state the change touches (open menu, error message, empty list, dialog).
 3. **Keyboard pass**: the manual checklist in `testing.md`.
 
-Done when, for every changed page and state: axe reports zero violations at the WCAG 2.2 AA tags, every "needs manual review" item has been looked at, and every manual checklist item has been checked. Report which layers ran, which states were scanned, and what stayed unverified (for example, no running dev server, or no screen reader available).
+Done when, for every changed page and state: axe reports zero violations at the WCAG 2.2 AA tags, every "needs manual review" item has been looked at, and every manual checklist item has been checked. Report which layers ran, which states were scanned, and what stayed unverified (for example, no running dev server, `playwright-cli` not installed, or no screen reader available).

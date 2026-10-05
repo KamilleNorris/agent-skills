@@ -18,12 +18,14 @@ Or clone and link `skills/<name>` into your agent's skills directory (e.g. `~/.a
 
 ## accessibility: axe scan setup
 
-`skills/accessibility/scripts/axe-scan.mjs` needs Node 20+, `playwright`, and `axe-core`. It uses the tested project's copies when present; otherwise install the pinned ones once:
+The scan runs axe-core in a browser driven by [`playwright-cli`](https://github.com/microsoft/playwright-cli):
 
 ```bash
-npm install --prefix skills/accessibility/scripts
-npx --prefix skills/accessibility/scripts playwright install chromium
-node skills/accessibility/scripts/axe-scan.mjs skills/accessibility/scripts/fixtures/broken.html   # expect 6 violations
+npm install -g @playwright/cli@latest
+python3 -m http.server 8000 --directory skills/accessibility/scripts/fixtures &
+playwright-cli open http://localhost:8000/broken.html
+playwright-cli --raw run-code --filename=skills/accessibility/scripts/axe.js   # expect 6 violations
+playwright-cli close
 ```
 
 ## License
