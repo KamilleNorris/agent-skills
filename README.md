@@ -5,6 +5,7 @@ Harness-agnostic [Agent Skills](https://agentskills.io): each skill is a `SKILL.
 | Skill | What it does |
 | --- | --- |
 | [`accessibility`](skills/accessibility/SKILL.md) | WCAG 2.2 AA rules for writing frontend code, plus testing with static lint, an axe-core scan of rendered pages, and a keyboard checklist |
+| [`vet-tests`](skills/vet-tests/SKILL.md) | Review just-written tests for quality and find duplicate or overlapping tests in a diff |
 
 ## Install
 
@@ -24,3 +25,7 @@ npm install --prefix skills/accessibility/scripts
 npx --prefix skills/accessibility/scripts playwright install chromium
 node skills/accessibility/scripts/axe-scan.mjs skills/accessibility/scripts/fixtures/broken.html   # expect 6 violations
 ```
+
+## License
+
+[MIT](LICENSE)
