@@ -18,7 +18,7 @@ If none is configured, recommend the matching plugin to the user instead of addi
 
 **Requires [`playwright-cli`](https://github.com/microsoft/playwright-cli) installed globally:** `npm install -g @playwright/cli@latest`. It drives the installed Chrome; if it reports a missing browser, run `playwright-cli install-browser`.
 
-Open the page with `playwright-cli`, then run `scripts/axe-scan.sh` (next to this skill's `SKILL.md`). It runs axe-core in the open page against every WCAG 2.0/2.1/2.2 A and AA rule, including `target-size`, which axe leaves off by default.
+Open the page with `playwright-cli`, then run `scripts/axe-scan.sh` (next to this skill's `SKILL.md`). It runs axe-core in the open page against every WCAG 2.0/2.1/2.2 A and AA rule axe ships (selected by tag, so rules added in new axe releases are included), including `target-size`, which axe leaves off by default.
 
 ```bash
 playwright-cli open http://localhost:3000/settings --config=<skill-dir>/scripts/cli.config.json
@@ -31,8 +31,8 @@ playwright-cli close
 Exit code `0` is clean, `1` means violations (report printed) or a scan error, `2` means `playwright-cli` is missing. Extra arguments go to `playwright-cli`, e.g. `axe-scan.sh -s=<session>` for a named session.
 
 **Where axe-core comes from.** The last line of the report names the source.
-- A global `axe-core` install (`npm install -g axe-core@4.13.0`) is used first and works offline.
-- Otherwise axe-core 4.13.0 downloads from jsDelivr on each scan.
+- A global `axe-core` install (`npm install -g axe-core`) is used first and works offline.
+- Otherwise the latest axe-core 4.x downloads from jsDelivr on each scan.
 - Pages with a strict Content-Security-Policy block the global file unless the browser was opened with `--config=<skill-dir>/scripts/cli.config.json` (it sets `bypassCSP`); without it the scan falls back to jsDelivr.
 
 **Options.** Set `window.axeScanOptions` with `eval` before the scan; it lasts until the next navigation.

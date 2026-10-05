@@ -4,9 +4,9 @@
  * through axe-scan.sh, which passes the path of a global axe-core install.
  *
  * axe-core comes from options.axePath when that file loads, otherwise from
- * jsDelivr at the pinned version. A strict Content-Security-Policy blocks the
- * file route unless the browser was opened with cli.config.json (bypassCSP);
- * the CDN route is unaffected.
+ * jsDelivr at the latest release of AXE_MAJOR_VERSION. A strict
+ * Content-Security-Policy blocks the file route unless the browser was opened
+ * with cli.config.json (bypassCSP); the CDN route is unaffected.
  *
  * Options are read from window.axeScanOptions, set beforehand with
  *   playwright-cli eval "window.axeScanOptions = { include: 'main', exclude: ['#ads'], bestPractices: true }"
@@ -17,7 +17,7 @@
  * Throws when violations are found, so the command exits non-zero.
  */
 async page => {
-  const AXE_VERSION = '4.13.0';
+  const AXE_MAJOR_VERSION = '4';
   const WCAG_22_AA_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
   const SNIPPET_MAX_LENGTH = 200;
 
@@ -32,9 +32,9 @@ async page => {
     } catch {}
   }
   if (!(await isAxeLoaded())) {
-    const cdnUrl = `https://cdn.jsdelivr.net/npm/axe-core@${AXE_VERSION}/axe.min.js`;
+    const cdnUrl = `https://cdn.jsdelivr.net/npm/axe-core@${AXE_MAJOR_VERSION}/axe.min.js`;
     const response = await fetch(cdnUrl);
-    if (!response.ok) throw new Error(`Could not download axe-core ${AXE_VERSION}: HTTP ${response.status}`);
+    if (!response.ok) throw new Error(`Could not download axe-core ${AXE_MAJOR_VERSION}.x: HTTP ${response.status}`);
     await page.evaluate(await response.text());
     axeSource = cdnUrl;
   }

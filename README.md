@@ -22,7 +22,7 @@ Or clone and link `skills/<name>` into your agent's skills directory (e.g. `~/.a
 
 ```bash
 npm install -g @playwright/cli@latest   # required
-npm install -g axe-core@4.13.0          # optional: offline scans; otherwise axe-core loads from jsDelivr
+npm install -g axe-core                 # optional: offline scans; otherwise axe-core loads from jsDelivr
 ```
 
 Check it works:
