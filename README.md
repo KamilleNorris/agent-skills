@@ -5,7 +5,7 @@ Harness-agnostic [Agent Skills](https://agentskills.io): each skill is a `SKILL.
 | Skill | What it does |
 | --- | --- |
 | [`accessibility`](skills/accessibility/SKILL.md) | WCAG 2.2 AA rules for writing frontend code, plus testing with static lint, an axe-core scan of rendered pages, and a keyboard checklist |
-| [`address-pr-feedback`](skills/address-pr-feedback/SKILL.md) | Fix or answer every unresolved review comment on a GitHub PR, from people and bots, then reply and resolve bot threads |
+| [`address-pr-feedback`](skills/address-pr-feedback/SKILL.md) | Fix or answer every unresolved review comment, failed GitHub Actions check and SonarQube issue on a GitHub PR, then reply and resolve bot threads |
 | [`vet-tests`](skills/vet-tests/SKILL.md) | Review just-written tests for quality and find duplicate or overlapping tests in a diff |
 
 ## Install
